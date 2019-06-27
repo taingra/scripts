@@ -1,0 +1,66 @@
+#!/bin/bash
+
+# Swap theme between light and dark.
+# Currently only works in GNOME.
+
+# Edit these variables for your desired theme and wallpaper
+light_theme="'Adwaita'"
+dark_theme="'Adwaita-dark'"
+# TODO: If left empty your wallpaper will be left the as is.
+light_wallpaper=""
+dark_wallpaper=""
+
+function set_theme
+{
+    dconf write '/org/gnome/desktop/interface/gtk-theme' $1
+}
+
+function set_wallpaper
+{
+    if [[ -z "$1" ]]; then
+	dconf write '/org/gnome/desktop/background/picture-url' "'file://"$1"'"
+    fi
+}
+
+function set_dark
+{
+    echo "Set Dark" >&2
+    set_theme $dark_theme
+    set_wallpaper $dark_wallpaper
+}
+
+function set_light
+{
+    echo "Set Light" >&2
+    set_theme $light_theme
+    set_wallpaper $light_wallpaper
+}
+
+function toggle_theme
+{
+    local current=$(dconf read '/org/gnome/desktop/interface/gtk-theme')
+
+    echo "Toggle theme:" >&2
+
+    if [[ $current = $dark_theme ]]; then
+	set_light
+    else
+	set_dark
+    fi
+}
+
+if [[ "$1" == "toggle" ]] || [[ -z "$1" ]]
+then
+    toggle_theme
+elif [[ "$1" == "dark" ]]
+then
+    set_dark
+elif [[ "$1" == "light" ]]
+then
+    set_light
+else
+    echo "Usage: $0 [light|dark|toggle]"
+    exit 1
+fi
+
+exit 0
