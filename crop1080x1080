@@ -1,0 +1,6 @@
+#!/bin/bash
+
+for file in "$@"
+do
+    ffmpeg -i $file -filter:v "crop=1080:1080:420:0" ${file%.*}\[square\].mp4
+done
